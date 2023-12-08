@@ -1,0 +1,91 @@
+#include <ESP32Servo.h>
+
+Servo servo_head;
+Servo servo_angle;
+Servo servo_base;
+
+int trigPin1 = 12; 
+int echoPin1 = 13; 
+int trigPin2 = 26; 
+int echoPin2 = 25; 
+//int buzzerPin = 26;
+
+void setup() {
+  Serial.begin(9600);
+  servo_head.attach(18); 
+  servo_angle.attach(19); 
+  servo_base.attach(21); 
+  pinMode(trigPin1, OUTPUT);
+  pinMode(echoPin1, INPUT);
+  pinMode(trigPin2, OUTPUT);
+  pinMode(echoPin2, INPUT);
+ // pinMode(buzzerPin, OUTPUT);
+}
+
+void loop() {
+  long duration_front, distance_front, duration_back, distance_back;
+
+  // 读取前方传感器数值
+  digitalWrite(trigPin1, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin1, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin1, LOW);
+  duration_front = pulseIn(echoPin1, HIGH);
+  distance_front = duration_front * 0.034 / 2;
+
+  // 读取后方传感器数值
+  digitalWrite(trigPin2, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin2, LOW);
+  duration_back = pulseIn(echoPin2, HIGH);
+  distance_back = duration_back * 0.034 / 2;
+
+  Serial.print("Distance front: ");
+  Serial.print(distance_front);
+  Serial.print(" cm\t");
+  Serial.print("Distance back: ");
+  Serial.print(distance_back);
+  Serial.println(" cm");
+
+if (distance_front < 50 && distance_back < 50) {
+      servo_head.write(90);
+      servo_angle.write(90);
+      servo_base.write(160);
+    
+    }else if (distance_front <= 50 && distance_back > 50 ){
+
+      servo_head.write(140);
+      servo_angle.write(130);
+      servo_base.write(170);
+      
+    }else if(distance_front > 50 && distance_back <= 50 ){
+      servo_head.write(60);
+      servo_angle.write(40);
+      servo_base.write(160);
+    }else{
+       servo_head.write(0);
+      servo_angle.write(170);
+      servo_base.write(30);
+}
+/*
+    if (distance_front <= 60) {
+      int toneValue = map(distance_front, 0, 60, 200, 2000);
+      tone(buzzerPin, toneValue);
+    } else {
+      noTone(buzzerPin);
+    }
+  
+  
+    if (distance_back <= 60) {
+      int toneValue = map(distance_back, 0, 60, 200, 2000);
+      tone(buzzerPin, toneValue);
+    } else {
+      noTone(buzzerPin);
+    }
+  */
+
+  delay(5000);
+}
